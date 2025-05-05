@@ -4,6 +4,6 @@ elegir (x) {
     caso 2:
         imprimir("Dos");
         romper;
-    defecto:
+    defecto
         imprimir("Otro");
 }

@@ -21,6 +21,7 @@ extern int numErroresLex;
 extern int numTokens;
 extern int numComentarios;
 int errores_sintacticos = 0;
+int error_manejado = 0; // Bandera para errores ya manejados
 
 void yyerror(const char *s);
 %}
@@ -101,17 +102,22 @@ declaracion
 
 bloque
     : '{' lista_declaraciones '}'
-    | '{' lista_declaraciones error {  // Falta '}'
-        agregarError(1, yylineno ); // 
+    | '{' lista_declaraciones error {
+        agregarError(1, yylineno); // Falta '}'
         yyerrok;
-        numErroresSintacticos++;
+        errores_sintacticos++; // Solo 1 error
     }
-    | error lista_declaraciones '}' {  // Falta '{'
-        agregarError(2, yylineno );
+    | error lista_declaraciones '}' {
+        agregarError(2, yylineno); // Falta '{'
         yyerrok;
-        numErroresSintacticos++;
+        errores_sintacticos++; // Solo 1 error
     }
-    | vacio
+    | sentencia {  // Caso especial para cuerpos sin llaves
+        // Solo marcar falta de apertura, el cierre puede ser el } siguiente
+        agregarError(2, yylineno); // Falta '{'
+        errores_sintacticos++;
+        // No usar yyerrok aquí para permitir detectar } como cierre
+    }
     ;
 
 lista_declaraciones
@@ -348,12 +354,6 @@ expr_sent
         numErroresSintacticos++;
     }
     ;
-// si
-//     : SI '(' expresion ')' bloque %prec SI
-//     | SI '(' expresion ')' bloque SINO bloque
-//     | SI '(' expresion ')' bloque SINO si 
-//     ;
-
 
 si
     : SI '(' expresion ')' bloque sinosi_opt
@@ -570,8 +570,14 @@ retorno
 
 funcion
     : tipo ID '(' parametros ')' bloque
+    | tipo ID '(' ')' bloque
     | tipo ID error parametros ')' bloque   {
-        agregarError(3, yylineno ); //falta  '(' abrir
+        agregarError(3, yylineno); //falta '(' abrir
+        yyerrok;
+        numErroresSintacticos++;
+    }
+    | tipo ID '(' parametros error bloque  {
+        agregarError(4, yylineno); //falta ')' cierre
         yyerrok;
         numErroresSintacticos++;
     }
@@ -580,19 +586,15 @@ funcion
         yyerrok;
         numErroresSintacticos++;
     }
-    | tipo ID '(' parametros error bloque  {
-        agregarError(4, yylineno ); //falta  ')' cierre
-        yyerrok;
-        numErroresSintacticos++;
-    }
     | VOID ID '(' parametros ')' bloque
+    | VOID ID '(' ')' bloque 
     | VOID ID error parametros ')' bloque   {
-        agregarError(3, yylineno ); //falta  '(' abrir
+        agregarError(3, yylineno); //falta '(' abrir
         yyerrok;
         numErroresSintacticos++;
     }
     | VOID ID '(' parametros error bloque  {
-        agregarError(4, yylineno ); //falta  ')' cierre
+        agregarError(4, yylineno); //falta ')' cierre
         yyerrok;
         numErroresSintacticos++;
     }
@@ -633,16 +635,15 @@ asignacion
     ;
 
 lvalor
-    :ID
+    : ID
     | ID '[' expresion ']'
-    | ID '[' expresion ']'
-    ID error expresion ']' {  // Falta '['
-        agregarError(6, yylineno ); // 
+    | ID error expresion ']' {  // Falta '['
+        agregarError(6, yylineno); 
         yyerrok;
         numErroresSintacticos++;
     }
-    ID '[' expresion error    {  // Falta ']'
-        agregarError(7, yylineno ); // 
+    | ID '[' expresion error {  // Falta ']'
+        agregarError(7, yylineno); 
         yyerrok;
         numErroresSintacticos++;
     }
@@ -752,53 +753,18 @@ literal
     | CADENA
     ;
 
-// imprimir
-//     : IMPRIMIR '(' argumentos_imprimir_opt ')' ';'
-//     ;
-
-// argumentos_imprimir_opt
-//     : vacio
-//     | lista_argumentos_imprimir
-//     ;
-
-// lista_argumentos_imprimir
-//     : expresion
-//     | lista_argumentos_imprimir ',' expresion
-//     ;
-// leer
-//     : LEER '(' argumento_leer ')' ';'
-//     ;
-
-// argumento_leer
-//     : ID
-//     ;
 
 vacio 
     :
     ;
-/*
-comentario
-    : comentario_una_linea
-    | comentario_multi_linea
-    ;
 
-comentario_una_linea
-    : /* Aqui puedes manejarlo en el lexer directamente 
-    ;
-
-comentario_multi_linea
-    : /* Aqui puedes manejarlo en el lexer directamente 
-    ;
-*/
 %%
 void yyerror(const char *msg) {
-    errores_sintacticos++;
-    // // Si el mensaje es el que pone Bison por defecto
-    // if (strcmp(msg, "syntax error") == 0) {
-    //     fprintf(stderr, "ERROR SINTACTICO: Se encontro un error inesperado en la linea %d\n", yylineno);
-    // } else {
-    //     fprintf(stderr, "ERROR SINTACTICO: %s (linea %d)\n", msg, yylineno);
-    // }
+    // Solo contar errores no manejados explícitamente
+    if (strstr(msg, "syntax error") && !error_manejado) {
+        errores_sintacticos++;
+    }
+    error_manejado = 0;  // Resetear para el próximo error
 }
 int errorYaRegistrado(int tipoError, int linea) {
     int i;
@@ -807,17 +773,24 @@ int errorYaRegistrado(int tipoError, int linea) {
             return 1; // ya existe
         }
     }
-   // fprintf(stderr, "   Entro: i: ", i);
     return 0;
 }
 
 void agregarError(int tipoError, int linea) {
-    if (numErroresSintacticos >= MAX_ERRORES) return;
-    if (errorYaRegistrado(tipoError, linea)) return;
-
-    listaErrores[numErroresSintacticos].tipoError = tipoError;
-    listaErrores[numErroresSintacticos].linea = linea;
-    numErroresSintacticos++;
+    // Verificar si ya existe un error idéntico
+    for (int i = 0; i < numErroresSintacticos; i++) {
+        if (listaErrores[i].tipoError == tipoError && 
+            listaErrores[i].linea == linea) {
+            return;  // Error ya registrado
+        }
+    }
+    
+    if (numErroresSintacticos < MAX_ERRORES) {
+        listaErrores[numErroresSintacticos].tipoError = tipoError;
+        listaErrores[numErroresSintacticos].linea = linea;
+        numErroresSintacticos++;
+        errores_sintacticos++;  // Incrementar el contador general
+    }
 }
 
 void mostrarErrores() {
@@ -856,9 +829,6 @@ void mostrarErrores() {
             case 11:
                 fprintf(stderr, "   Error sintactico: falta simbolo ',' de asignacion. Linea:  %d\n", listaErrores[i].linea);
                 break;
-                /*default: //error cuando no se puede identificar el error
-                fprintf(stderr, "   Error sintactico desconocido perros %d\n", listaErrores[i].linea);
-                break;*/
         }
     }
 }

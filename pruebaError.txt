@@ -1,6 +1,2 @@
-//2. Falta '{' de apertura
-
-entero funcion()
+entero funcion(){
     imprimir("Falta llave de apertura");
-}
-
