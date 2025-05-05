@@ -1,0 +1,9 @@
+elegir (x) {
+    caso 1:
+        imprimir("Uno";
+    caso 2:
+        imprimir("Dos");
+        romper;
+    defecto:
+        imprimir("Otro");
+}

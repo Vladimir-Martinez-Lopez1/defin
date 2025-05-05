@@ -1,0 +1,11 @@
+// Caso 1: Un solo argumento
+imprimir("Hola mundo");
+
+// Caso 2: Concatenación básica
+imprimir("Valor:", x);
+
+// Caso 3: Expresión compleja
+imprimir("Resultado:", (a + b) * c);
+
+// Caso 4: Múltiples argumentos
+imprimir("Datos:", nombre, ", Edad:", edad);

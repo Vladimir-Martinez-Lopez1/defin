@@ -1,0 +1,33 @@
+entero x = 10;
+si (x > 5) {
+    imprimir("x es mayor que 5");
+}
+
+entero edad = 17;
+si (edad >= 18) {
+    imprimir("Mayor de edad");
+} sino {
+    imprimir("Menor de edad");
+}
+
+entero nota = 75;
+si (nota >= 90) {
+    imprimir("A");
+} sinosi (nota >= 80 {  // Falta paréntesis de cierre
+    imprimir("B");
+} sinosi (nota >= 70)
+    imprimir("C");  // Falta llaves
+} sino {
+    imprimir("D");
+}
+
+entero a = 5, b = 10, c = 15;
+si ((a < b) && (b < c) || (c == 15)) {  // Paréntesis extra
+    imprimir("Condición compleja verdadera");
+}
+
+booleano condicion = falso;
+si (condicion) {
+    // Bloque vacío intencional
+}
+imprimir("Pasó el if vacío");

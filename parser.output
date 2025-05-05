@@ -1,0 +1,3046 @@
+Rules useless in parser due to conflicts
+
+   66 sentencias_con_romper: lista_sentencias ROMPER ';'
+
+
+Estado 4 conflictos: 1 reducción(ones)/reducción(ones)
+Estado 25 conflictos: 1 desplazamiento(s)/reducción(ones)
+Estado 54 conflictos: 1 desplazamiento(s)/reducción(ones)
+Estado 56 conflictos: 1 desplazamiento(s)/reducción(ones)
+Estado 58 conflictos: 1 desplazamiento(s)/reducción(ones)
+Estado 171 conflictos: 1 reducción(ones)/reducción(ones)
+Estado 234 conflictos: 3 reducción(ones)/reducción(ones)
+
+
+Gramática
+
+    0 $accept: programa $end
+
+    1 programa: lista_declaraciones
+
+    2 lista_declaraciones: /* vacío */
+    3                    | lista_declaraciones declaracion
+
+    4 declaracion: funcion
+    5            | estructura
+    6            | variable
+    7            | constante
+    8            | arreglo
+    9            | comentario
+
+   10 comentario: COMENTARIO
+
+   11 estructura: ESTRUCTURA ID '{' lista_miembros '}' ';'
+
+   12 lista_miembros: /* vacío */
+   13               | lista_miembros tipo ID ';'
+
+   14 variable: tipo ID '=' expresion_no_asig ';'
+   15         | tipo ID ';'
+
+   16 constante: CONSTANTE tipo_base ID '=' expresion_no_asig ';'
+
+   17 arreglo: tipo ID '[' tamano ']' '=' '{' lista_expresiones '}' ';'
+   18        | tipo ID '[' tamano ']' ';'
+
+   19 tamano: ENTERO
+   20       | ID
+
+   21 lista_expresiones: expresion_no_asig
+   22                  | lista_expresiones ',' expresion_no_asig
+
+   23 tipo: tipo_base
+   24     | CONSTANTE tipo_base
+   25     | ID
+
+   26 tipo_base: TIPO_ENT
+   27          | TIPO_FLOAT
+   28          | TIPO_CHAR
+   29          | TIPO_BOOL
+   30          | TIPO_STRING
+   31          | ID
+
+   32 funcion: tipo ID '(' ')' bloque
+   33        | tipo ID '(' parametros ')' bloque
+   34        | VOID ID '(' ')' bloque
+   35        | VOID ID '(' parametros ')' bloque
+
+   36 parametros: parametro
+   37           | parametros ',' parametro
+
+   38 parametro: tipo ID
+   39          | tipo ID '=' expresion_no_asig
+
+   40 $@1: /* vacío */
+
+   41 bloque: '{' $@1 lista_sentencias '}'
+
+   42 lista_sentencias: /* vacío */
+   43                 | lista_sentencias sentencia
+
+   44 sentencia: si
+   45          | elegir
+   46          | bucle
+   47          | retorno
+   48          | ROMPER ';'
+   49          | CONTINUAR ';'
+   50          | expr_sent
+   51          | bloque
+   52          | comentario
+   53          | imprimir
+   54          | leer
+
+   55 expr_sent: expresion ';'
+
+   56 si: SI '(' expresion ')' bloque lista_sinosi_opcional sino_opcional
+
+   57 lista_sinosi_opcional: /* vacío */
+   58                      | lista_sinosi_opcional SINOSI '(' expresion ')' bloque
+
+   59 sino_opcional: /* vacío */
+   60              | SINO bloque
+
+   61 elegir: ELEGIR '(' expresion ')' '{' lista_casos_opcional defecto_opcional '}'
+
+   62 lista_casos_opcional: /* vacío */
+   63                     | lista_casos_opcional CASO expresion ':' sentencias_con_romper
+
+   64 defecto_opcional: DEFECTO ':' sentencias_con_romper
+
+   65 sentencias_con_romper: lista_sentencias
+   66                      | lista_sentencias ROMPER ';'
+
+   67 bucle: mientras
+   68      | para
+   69      | hacer_mientras
+
+   70 mientras: MIENTRAS '(' expresion ')' bloque
+
+   71 para: PARA '(' variable expresion_opt ';' expresion_opt ')' bloque
+   72     | PARA '(' expr_sent expresion_opt ';' expresion_opt ')' bloque
+   73     | PARA '(' ';' expresion_opt ';' expresion_opt ')' bloque
+
+   74 expresion_opt: /* vacío */
+   75              | expresion
+
+   76 hacer_mientras: HACER bloque MIENTRAS '(' expresion ')' ';'
+
+   77 retorno: DEVOLVER ';'
+   78        | DEVOLVER expresion ';'
+
+   79 expresion: asignacion
+   80          | expresion_no_asig
+
+   81 asignacion: ID '=' expresion
+
+   82 expresion_no_asig: logica_or
+
+   83 logica_or: logica_and
+   84          | logica_or OP_LOGICO logica_and
+
+   85 logica_and: igualdad
+   86           | logica_and OP_LOGICO igualdad
+
+   87 igualdad: relacional
+   88         | igualdad OP_REL relacional
+
+   89 relacional: aditiva
+   90           | relacional OP_REL aditiva
+
+   91 aditiva: multiplicativa
+   92        | aditiva OP_ARIT multiplicativa
+
+   93 multiplicativa: unaria
+   94               | multiplicativa OP_ARIT unaria
+
+   95 unaria: OP_ARIT unaria
+   96       | '!' unaria
+   97       | postfija
+
+   98 postfija: primaria
+   99         | primaria OP_INCDEC
+
+  100 primaria: literal
+  101         | ID
+  102         | ID '[' expresion ']'
+  103         | ID '.' ID
+  104         | '(' expresion ')'
+
+  105 literal: ENTERO
+  106        | FLOTANTE
+  107        | CARACTER
+  108        | VERDADERO
+  109        | FALSO
+  110        | CADENA
+
+  111 imprimir: IMPRIMIR '(' ')' ';'
+  112         | IMPRIMIR '(' argumentos_imprimir ')' ';'
+
+  113 argumentos_imprimir: expresion
+  114                    | argumentos_imprimir ',' expresion
+
+  115 leer: LEER '(' ID ')' ';'
+
+
+Terminales con las reglas donde aparecen
+
+$end (0) 0
+'!' (33) 96
+'(' (40) 32 33 34 35 56 58 61 70 71 72 73 76 104 111 112 115
+')' (41) 32 33 34 35 56 58 61 70 71 72 73 76 104 111 112 115
+',' (44) 22 37 114
+'.' (46) 103
+':' (58) 63 64
+';' (59) 11 13 14 15 16 17 18 48 49 55 66 71 72 73 76 77 78 111 112
+    115
+'=' (61) 14 16 17 39 81
+'[' (91) 17 18 102
+']' (93) 17 18 102
+'{' (123) 11 17 41 61
+'}' (125) 11 17 41 61
+error (256)
+ID (258) 11 13 14 15 16 17 18 20 25 31 32 33 34 35 38 39 81 101 102
+    103 115
+CADENA (259) 110
+ENTERO (260) 19 105
+FLOTANTE (261) 106
+CARACTER (262) 107
+TIPO_ENT (263) 26
+TIPO_FLOAT (264) 27
+TIPO_CHAR (265) 28
+TIPO_BOOL (266) 29
+TIPO_STRING (267) 30
+VOID (268) 34 35
+CONSTANTE (269) 16 24
+ESTRUCTURA (270) 11
+SI (271) 56
+SINOSI (272) 58
+SINO (273) 60
+ELEGIR (274) 61
+CASO (275) 63
+DEFECTO (276) 64
+ROMPER (277) 48 66
+CONTINUAR (278) 49
+IMPRIMIR (279) 111 112
+LEER (280) 115
+DEVOLVER (281) 77 78
+MIENTRAS (282) 70 76
+PARA (283) 71 72 73
+HACER (284) 76
+VERDADERO (285) 108
+FALSO (286) 109
+OP_LOGICO (287) 84 86
+OP_ARIT (288) 92 94 95
+OP_REL (289) 88 90
+OP_INCDEC (290) 99
+COMENTARIO (291) 10
+
+
+No terminales con las reglas donde aparecen
+
+$accept (49)
+    en la izquierda: 0
+programa (50)
+    en la izquierda: 1, en la derecha: 0
+lista_declaraciones (51)
+    en la izquierda: 2 3, en la derecha: 1 3
+declaracion (52)
+    en la izquierda: 4 5 6 7 8 9, en la derecha: 3
+comentario (53)
+    en la izquierda: 10, en la derecha: 9 52
+estructura (54)
+    en la izquierda: 11, en la derecha: 5
+lista_miembros (55)
+    en la izquierda: 12 13, en la derecha: 11 13
+variable (56)
+    en la izquierda: 14 15, en la derecha: 6 71
+constante (57)
+    en la izquierda: 16, en la derecha: 7
+arreglo (58)
+    en la izquierda: 17 18, en la derecha: 8
+tamano (59)
+    en la izquierda: 19 20, en la derecha: 17 18
+lista_expresiones (60)
+    en la izquierda: 21 22, en la derecha: 17 22
+tipo (61)
+    en la izquierda: 23 24 25, en la derecha: 13 14 15 17 18 32 33
+    38 39
+tipo_base (62)
+    en la izquierda: 26 27 28 29 30 31, en la derecha: 16 23 24
+funcion (63)
+    en la izquierda: 32 33 34 35, en la derecha: 4
+parametros (64)
+    en la izquierda: 36 37, en la derecha: 33 35 37
+parametro (65)
+    en la izquierda: 38 39, en la derecha: 36 37
+bloque (66)
+    en la izquierda: 41, en la derecha: 32 33 34 35 51 56 58 60 70
+    71 72 73 76
+$@1 (67)
+    en la izquierda: 40, en la derecha: 41
+lista_sentencias (68)
+    en la izquierda: 42 43, en la derecha: 41 43 65 66
+sentencia (69)
+    en la izquierda: 44 45 46 47 48 49 50 51 52 53 54, en la derecha:
+    43
+expr_sent (70)
+    en la izquierda: 55, en la derecha: 50 72
+si (71)
+    en la izquierda: 56, en la derecha: 44
+lista_sinosi_opcional (72)
+    en la izquierda: 57 58, en la derecha: 56 58
+sino_opcional (73)
+    en la izquierda: 59 60, en la derecha: 56
+elegir (74)
+    en la izquierda: 61, en la derecha: 45
+lista_casos_opcional (75)
+    en la izquierda: 62 63, en la derecha: 61 63
+defecto_opcional (76)
+    en la izquierda: 64, en la derecha: 61
+sentencias_con_romper (77)
+    en la izquierda: 65 66, en la derecha: 63 64
+bucle (78)
+    en la izquierda: 67 68 69, en la derecha: 46
+mientras (79)
+    en la izquierda: 70, en la derecha: 67
+para (80)
+    en la izquierda: 71 72 73, en la derecha: 68
+expresion_opt (81)
+    en la izquierda: 74 75, en la derecha: 71 72 73
+hacer_mientras (82)
+    en la izquierda: 76, en la derecha: 69
+retorno (83)
+    en la izquierda: 77 78, en la derecha: 47
+expresion (84)
+    en la izquierda: 79 80, en la derecha: 55 56 58 61 63 70 75 76
+    78 81 102 104 113 114
+asignacion (85)
+    en la izquierda: 81, en la derecha: 79
+expresion_no_asig (86)
+    en la izquierda: 82, en la derecha: 14 16 21 22 39 80
+logica_or (87)
+    en la izquierda: 83 84, en la derecha: 82 84
+logica_and (88)
+    en la izquierda: 85 86, en la derecha: 83 84 86
+igualdad (89)
+    en la izquierda: 87 88, en la derecha: 85 86 88
+relacional (90)
+    en la izquierda: 89 90, en la derecha: 87 88 90
+aditiva (91)
+    en la izquierda: 91 92, en la derecha: 89 90 92
+multiplicativa (92)
+    en la izquierda: 93 94, en la derecha: 91 92 94
+unaria (93)
+    en la izquierda: 95 96 97, en la derecha: 93 94 95 96
+postfija (94)
+    en la izquierda: 98 99, en la derecha: 97
+primaria (95)
+    en la izquierda: 100 101 102 103 104, en la derecha: 98 99
+literal (96)
+    en la izquierda: 105 106 107 108 109 110, en la derecha: 100
+imprimir (97)
+    en la izquierda: 111 112, en la derecha: 53
+argumentos_imprimir (98)
+    en la izquierda: 113 114, en la derecha: 112 114
+leer (99)
+    en la izquierda: 115, en la derecha: 54
+
+
+estado 0
+
+    0 $accept: . programa $end
+
+    $default  reduce usando la regla 2 (lista_declaraciones)
+
+    programa             ir al estado 1
+    lista_declaraciones  ir al estado 2
+
+
+estado 1
+
+    0 $accept: programa . $end
+
+    $end  desplazar e ir al estado 3
+
+
+estado 2
+
+    1 programa: lista_declaraciones .
+    3 lista_declaraciones: lista_declaraciones . declaracion
+
+    ID           desplazar e ir al estado 4
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+    VOID         desplazar e ir al estado 10
+    CONSTANTE    desplazar e ir al estado 11
+    ESTRUCTURA   desplazar e ir al estado 12
+    COMENTARIO   desplazar e ir al estado 13
+
+    $default  reduce usando la regla 1 (programa)
+
+    declaracion  ir al estado 14
+    comentario   ir al estado 15
+    estructura   ir al estado 16
+    variable     ir al estado 17
+    constante    ir al estado 18
+    arreglo      ir al estado 19
+    tipo         ir al estado 20
+    tipo_base    ir al estado 21
+    funcion      ir al estado 22
+
+
+estado 3
+
+    0 $accept: programa $end .
+
+    $default  aceptar
+
+
+estado 4
+
+   25 tipo: ID .
+   31 tipo_base: ID .
+
+    ID        reduce usando la regla 25 (tipo)
+    ID        [reduce usando la regla 31 (tipo_base)]
+    $default  reduce usando la regla 25 (tipo)
+
+
+estado 5
+
+   26 tipo_base: TIPO_ENT .
+
+    $default  reduce usando la regla 26 (tipo_base)
+
+
+estado 6
+
+   27 tipo_base: TIPO_FLOAT .
+
+    $default  reduce usando la regla 27 (tipo_base)
+
+
+estado 7
+
+   28 tipo_base: TIPO_CHAR .
+
+    $default  reduce usando la regla 28 (tipo_base)
+
+
+estado 8
+
+   29 tipo_base: TIPO_BOOL .
+
+    $default  reduce usando la regla 29 (tipo_base)
+
+
+estado 9
+
+   30 tipo_base: TIPO_STRING .
+
+    $default  reduce usando la regla 30 (tipo_base)
+
+
+estado 10
+
+   34 funcion: VOID . ID '(' ')' bloque
+   35        | VOID . ID '(' parametros ')' bloque
+
+    ID  desplazar e ir al estado 23
+
+
+estado 11
+
+   16 constante: CONSTANTE . tipo_base ID '=' expresion_no_asig ';'
+   24 tipo: CONSTANTE . tipo_base
+
+    ID           desplazar e ir al estado 24
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+
+    tipo_base  ir al estado 25
+
+
+estado 12
+
+   11 estructura: ESTRUCTURA . ID '{' lista_miembros '}' ';'
+
+    ID  desplazar e ir al estado 26
+
+
+estado 13
+
+   10 comentario: COMENTARIO .
+
+    $default  reduce usando la regla 10 (comentario)
+
+
+estado 14
+
+    3 lista_declaraciones: lista_declaraciones declaracion .
+
+    $default  reduce usando la regla 3 (lista_declaraciones)
+
+
+estado 15
+
+    9 declaracion: comentario .
+
+    $default  reduce usando la regla 9 (declaracion)
+
+
+estado 16
+
+    5 declaracion: estructura .
+
+    $default  reduce usando la regla 5 (declaracion)
+
+
+estado 17
+
+    6 declaracion: variable .
+
+    $default  reduce usando la regla 6 (declaracion)
+
+
+estado 18
+
+    7 declaracion: constante .
+
+    $default  reduce usando la regla 7 (declaracion)
+
+
+estado 19
+
+    8 declaracion: arreglo .
+
+    $default  reduce usando la regla 8 (declaracion)
+
+
+estado 20
+
+   14 variable: tipo . ID '=' expresion_no_asig ';'
+   15         | tipo . ID ';'
+   17 arreglo: tipo . ID '[' tamano ']' '=' '{' lista_expresiones '}' ';'
+   18        | tipo . ID '[' tamano ']' ';'
+   32 funcion: tipo . ID '(' ')' bloque
+   33        | tipo . ID '(' parametros ')' bloque
+
+    ID  desplazar e ir al estado 27
+
+
+estado 21
+
+   23 tipo: tipo_base .
+
+    $default  reduce usando la regla 23 (tipo)
+
+
+estado 22
+
+    4 declaracion: funcion .
+
+    $default  reduce usando la regla 4 (declaracion)
+
+
+estado 23
+
+   34 funcion: VOID ID . '(' ')' bloque
+   35        | VOID ID . '(' parametros ')' bloque
+
+    '('  desplazar e ir al estado 28
+
+
+estado 24
+
+   31 tipo_base: ID .
+
+    $default  reduce usando la regla 31 (tipo_base)
+
+
+estado 25
+
+   16 constante: CONSTANTE tipo_base . ID '=' expresion_no_asig ';'
+   24 tipo: CONSTANTE tipo_base .
+
+    ID  desplazar e ir al estado 29
+
+    ID  [reduce usando la regla 24 (tipo)]
+
+
+estado 26
+
+   11 estructura: ESTRUCTURA ID . '{' lista_miembros '}' ';'
+
+    '{'  desplazar e ir al estado 30
+
+
+estado 27
+
+   14 variable: tipo ID . '=' expresion_no_asig ';'
+   15         | tipo ID . ';'
+   17 arreglo: tipo ID . '[' tamano ']' '=' '{' lista_expresiones '}' ';'
+   18        | tipo ID . '[' tamano ']' ';'
+   32 funcion: tipo ID . '(' ')' bloque
+   33        | tipo ID . '(' parametros ')' bloque
+
+    '='  desplazar e ir al estado 31
+    ';'  desplazar e ir al estado 32
+    '['  desplazar e ir al estado 33
+    '('  desplazar e ir al estado 34
+
+
+estado 28
+
+   34 funcion: VOID ID '(' . ')' bloque
+   35        | VOID ID '(' . parametros ')' bloque
+
+    ID           desplazar e ir al estado 4
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+    CONSTANTE    desplazar e ir al estado 35
+    ')'          desplazar e ir al estado 36
+
+    tipo        ir al estado 37
+    tipo_base   ir al estado 21
+    parametros  ir al estado 38
+    parametro   ir al estado 39
+
+
+estado 29
+
+   16 constante: CONSTANTE tipo_base ID . '=' expresion_no_asig ';'
+
+    '='  desplazar e ir al estado 40
+
+
+estado 30
+
+   11 estructura: ESTRUCTURA ID '{' . lista_miembros '}' ';'
+
+    $default  reduce usando la regla 12 (lista_miembros)
+
+    lista_miembros  ir al estado 41
+
+
+estado 31
+
+   14 variable: tipo ID '=' . expresion_no_asig ';'
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion_no_asig  ir al estado 52
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 32
+
+   15 variable: tipo ID ';' .
+
+    $default  reduce usando la regla 15 (variable)
+
+
+estado 33
+
+   17 arreglo: tipo ID '[' . tamano ']' '=' '{' lista_expresiones '}' ';'
+   18        | tipo ID '[' . tamano ']' ';'
+
+    ID      desplazar e ir al estado 63
+    ENTERO  desplazar e ir al estado 64
+
+    tamano  ir al estado 65
+
+
+estado 34
+
+   32 funcion: tipo ID '(' . ')' bloque
+   33        | tipo ID '(' . parametros ')' bloque
+
+    ID           desplazar e ir al estado 4
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+    CONSTANTE    desplazar e ir al estado 35
+    ')'          desplazar e ir al estado 66
+
+    tipo        ir al estado 37
+    tipo_base   ir al estado 21
+    parametros  ir al estado 67
+    parametro   ir al estado 39
+
+
+estado 35
+
+   24 tipo: CONSTANTE . tipo_base
+
+    ID           desplazar e ir al estado 24
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+
+    tipo_base  ir al estado 68
+
+
+estado 36
+
+   34 funcion: VOID ID '(' ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 70
+
+
+estado 37
+
+   38 parametro: tipo . ID
+   39          | tipo . ID '=' expresion_no_asig
+
+    ID  desplazar e ir al estado 71
+
+
+estado 38
+
+   35 funcion: VOID ID '(' parametros . ')' bloque
+   37 parametros: parametros . ',' parametro
+
+    ','  desplazar e ir al estado 72
+    ')'  desplazar e ir al estado 73
+
+
+estado 39
+
+   36 parametros: parametro .
+
+    $default  reduce usando la regla 36 (parametros)
+
+
+estado 40
+
+   16 constante: CONSTANTE tipo_base ID '=' . expresion_no_asig ';'
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion_no_asig  ir al estado 74
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 41
+
+   11 estructura: ESTRUCTURA ID '{' lista_miembros . '}' ';'
+   13 lista_miembros: lista_miembros . tipo ID ';'
+
+    ID           desplazar e ir al estado 4
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+    CONSTANTE    desplazar e ir al estado 35
+    '}'          desplazar e ir al estado 75
+
+    tipo       ir al estado 76
+    tipo_base  ir al estado 21
+
+
+estado 42
+
+  101 primaria: ID .
+  102         | ID . '[' expresion ']'
+  103         | ID . '.' ID
+
+    '['  desplazar e ir al estado 77
+    '.'  desplazar e ir al estado 78
+
+    $default  reduce usando la regla 101 (primaria)
+
+
+estado 43
+
+  110 literal: CADENA .
+
+    $default  reduce usando la regla 110 (literal)
+
+
+estado 44
+
+  105 literal: ENTERO .
+
+    $default  reduce usando la regla 105 (literal)
+
+
+estado 45
+
+  106 literal: FLOTANTE .
+
+    $default  reduce usando la regla 106 (literal)
+
+
+estado 46
+
+  107 literal: CARACTER .
+
+    $default  reduce usando la regla 107 (literal)
+
+
+estado 47
+
+  108 literal: VERDADERO .
+
+    $default  reduce usando la regla 108 (literal)
+
+
+estado 48
+
+  109 literal: FALSO .
+
+    $default  reduce usando la regla 109 (literal)
+
+
+estado 49
+
+   95 unaria: OP_ARIT . unaria
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    unaria    ir al estado 79
+    postfija  ir al estado 60
+    primaria  ir al estado 61
+    literal   ir al estado 62
+
+
+estado 50
+
+  104 primaria: '(' . expresion ')'
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 81
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 51
+
+   96 unaria: '!' . unaria
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    unaria    ir al estado 84
+    postfija  ir al estado 60
+    primaria  ir al estado 61
+    literal   ir al estado 62
+
+
+estado 52
+
+   14 variable: tipo ID '=' expresion_no_asig . ';'
+
+    ';'  desplazar e ir al estado 85
+
+
+estado 53
+
+   82 expresion_no_asig: logica_or .
+   84 logica_or: logica_or . OP_LOGICO logica_and
+
+    OP_LOGICO  desplazar e ir al estado 86
+
+    $default  reduce usando la regla 82 (expresion_no_asig)
+
+
+estado 54
+
+   83 logica_or: logica_and .
+   86 logica_and: logica_and . OP_LOGICO igualdad
+
+    OP_LOGICO  desplazar e ir al estado 87
+
+    OP_LOGICO  [reduce usando la regla 83 (logica_or)]
+    $default   reduce usando la regla 83 (logica_or)
+
+
+estado 55
+
+   85 logica_and: igualdad .
+   88 igualdad: igualdad . OP_REL relacional
+
+    OP_REL  desplazar e ir al estado 88
+
+    $default  reduce usando la regla 85 (logica_and)
+
+
+estado 56
+
+   87 igualdad: relacional .
+   90 relacional: relacional . OP_REL aditiva
+
+    OP_REL  desplazar e ir al estado 89
+
+    OP_REL    [reduce usando la regla 87 (igualdad)]
+    $default  reduce usando la regla 87 (igualdad)
+
+
+estado 57
+
+   89 relacional: aditiva .
+   92 aditiva: aditiva . OP_ARIT multiplicativa
+
+    OP_ARIT  desplazar e ir al estado 90
+
+    $default  reduce usando la regla 89 (relacional)
+
+
+estado 58
+
+   91 aditiva: multiplicativa .
+   94 multiplicativa: multiplicativa . OP_ARIT unaria
+
+    OP_ARIT  desplazar e ir al estado 91
+
+    OP_ARIT   [reduce usando la regla 91 (aditiva)]
+    $default  reduce usando la regla 91 (aditiva)
+
+
+estado 59
+
+   93 multiplicativa: unaria .
+
+    $default  reduce usando la regla 93 (multiplicativa)
+
+
+estado 60
+
+   97 unaria: postfija .
+
+    $default  reduce usando la regla 97 (unaria)
+
+
+estado 61
+
+   98 postfija: primaria .
+   99         | primaria . OP_INCDEC
+
+    OP_INCDEC  desplazar e ir al estado 92
+
+    $default  reduce usando la regla 98 (postfija)
+
+
+estado 62
+
+  100 primaria: literal .
+
+    $default  reduce usando la regla 100 (primaria)
+
+
+estado 63
+
+   20 tamano: ID .
+
+    $default  reduce usando la regla 20 (tamano)
+
+
+estado 64
+
+   19 tamano: ENTERO .
+
+    $default  reduce usando la regla 19 (tamano)
+
+
+estado 65
+
+   17 arreglo: tipo ID '[' tamano . ']' '=' '{' lista_expresiones '}' ';'
+   18        | tipo ID '[' tamano . ']' ';'
+
+    ']'  desplazar e ir al estado 93
+
+
+estado 66
+
+   32 funcion: tipo ID '(' ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 94
+
+
+estado 67
+
+   33 funcion: tipo ID '(' parametros . ')' bloque
+   37 parametros: parametros . ',' parametro
+
+    ','  desplazar e ir al estado 72
+    ')'  desplazar e ir al estado 95
+
+
+estado 68
+
+   24 tipo: CONSTANTE tipo_base .
+
+    $default  reduce usando la regla 24 (tipo)
+
+
+estado 69
+
+   41 bloque: '{' . $@1 lista_sentencias '}'
+
+    $default  reduce usando la regla 40 ($@1)
+
+    $@1  ir al estado 96
+
+
+estado 70
+
+   34 funcion: VOID ID '(' ')' bloque .
+
+    $default  reduce usando la regla 34 (funcion)
+
+
+estado 71
+
+   38 parametro: tipo ID .
+   39          | tipo ID . '=' expresion_no_asig
+
+    '='  desplazar e ir al estado 97
+
+    $default  reduce usando la regla 38 (parametro)
+
+
+estado 72
+
+   37 parametros: parametros ',' . parametro
+
+    ID           desplazar e ir al estado 4
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+    CONSTANTE    desplazar e ir al estado 35
+
+    tipo       ir al estado 37
+    tipo_base  ir al estado 21
+    parametro  ir al estado 98
+
+
+estado 73
+
+   35 funcion: VOID ID '(' parametros ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 99
+
+
+estado 74
+
+   16 constante: CONSTANTE tipo_base ID '=' expresion_no_asig . ';'
+
+    ';'  desplazar e ir al estado 100
+
+
+estado 75
+
+   11 estructura: ESTRUCTURA ID '{' lista_miembros '}' . ';'
+
+    ';'  desplazar e ir al estado 101
+
+
+estado 76
+
+   13 lista_miembros: lista_miembros tipo . ID ';'
+
+    ID  desplazar e ir al estado 102
+
+
+estado 77
+
+  102 primaria: ID '[' . expresion ']'
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 103
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 78
+
+  103 primaria: ID '.' . ID
+
+    ID  desplazar e ir al estado 104
+
+
+estado 79
+
+   95 unaria: OP_ARIT unaria .
+
+    $default  reduce usando la regla 95 (unaria)
+
+
+estado 80
+
+   81 asignacion: ID . '=' expresion
+  101 primaria: ID .
+  102         | ID . '[' expresion ']'
+  103         | ID . '.' ID
+
+    '='  desplazar e ir al estado 105
+    '['  desplazar e ir al estado 77
+    '.'  desplazar e ir al estado 78
+
+    $default  reduce usando la regla 101 (primaria)
+
+
+estado 81
+
+  104 primaria: '(' expresion . ')'
+
+    ')'  desplazar e ir al estado 106
+
+
+estado 82
+
+   79 expresion: asignacion .
+
+    $default  reduce usando la regla 79 (expresion)
+
+
+estado 83
+
+   80 expresion: expresion_no_asig .
+
+    $default  reduce usando la regla 80 (expresion)
+
+
+estado 84
+
+   96 unaria: '!' unaria .
+
+    $default  reduce usando la regla 96 (unaria)
+
+
+estado 85
+
+   14 variable: tipo ID '=' expresion_no_asig ';' .
+
+    $default  reduce usando la regla 14 (variable)
+
+
+estado 86
+
+   84 logica_or: logica_or OP_LOGICO . logica_and
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    logica_and      ir al estado 107
+    igualdad        ir al estado 55
+    relacional      ir al estado 56
+    aditiva         ir al estado 57
+    multiplicativa  ir al estado 58
+    unaria          ir al estado 59
+    postfija        ir al estado 60
+    primaria        ir al estado 61
+    literal         ir al estado 62
+
+
+estado 87
+
+   86 logica_and: logica_and OP_LOGICO . igualdad
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    igualdad        ir al estado 108
+    relacional      ir al estado 56
+    aditiva         ir al estado 57
+    multiplicativa  ir al estado 58
+    unaria          ir al estado 59
+    postfija        ir al estado 60
+    primaria        ir al estado 61
+    literal         ir al estado 62
+
+
+estado 88
+
+   88 igualdad: igualdad OP_REL . relacional
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    relacional      ir al estado 109
+    aditiva         ir al estado 57
+    multiplicativa  ir al estado 58
+    unaria          ir al estado 59
+    postfija        ir al estado 60
+    primaria        ir al estado 61
+    literal         ir al estado 62
+
+
+estado 89
+
+   90 relacional: relacional OP_REL . aditiva
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    aditiva         ir al estado 110
+    multiplicativa  ir al estado 58
+    unaria          ir al estado 59
+    postfija        ir al estado 60
+    primaria        ir al estado 61
+    literal         ir al estado 62
+
+
+estado 90
+
+   92 aditiva: aditiva OP_ARIT . multiplicativa
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    multiplicativa  ir al estado 111
+    unaria          ir al estado 59
+    postfija        ir al estado 60
+    primaria        ir al estado 61
+    literal         ir al estado 62
+
+
+estado 91
+
+   94 multiplicativa: multiplicativa OP_ARIT . unaria
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    unaria    ir al estado 112
+    postfija  ir al estado 60
+    primaria  ir al estado 61
+    literal   ir al estado 62
+
+
+estado 92
+
+   99 postfija: primaria OP_INCDEC .
+
+    $default  reduce usando la regla 99 (postfija)
+
+
+estado 93
+
+   17 arreglo: tipo ID '[' tamano ']' . '=' '{' lista_expresiones '}' ';'
+   18        | tipo ID '[' tamano ']' . ';'
+
+    '='  desplazar e ir al estado 113
+    ';'  desplazar e ir al estado 114
+
+
+estado 94
+
+   32 funcion: tipo ID '(' ')' bloque .
+
+    $default  reduce usando la regla 32 (funcion)
+
+
+estado 95
+
+   33 funcion: tipo ID '(' parametros ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 115
+
+
+estado 96
+
+   41 bloque: '{' $@1 . lista_sentencias '}'
+
+    $default  reduce usando la regla 42 (lista_sentencias)
+
+    lista_sentencias  ir al estado 116
+
+
+estado 97
+
+   39 parametro: tipo ID '=' . expresion_no_asig
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion_no_asig  ir al estado 117
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 98
+
+   37 parametros: parametros ',' parametro .
+
+    $default  reduce usando la regla 37 (parametros)
+
+
+estado 99
+
+   35 funcion: VOID ID '(' parametros ')' bloque .
+
+    $default  reduce usando la regla 35 (funcion)
+
+
+estado 100
+
+   16 constante: CONSTANTE tipo_base ID '=' expresion_no_asig ';' .
+
+    $default  reduce usando la regla 16 (constante)
+
+
+estado 101
+
+   11 estructura: ESTRUCTURA ID '{' lista_miembros '}' ';' .
+
+    $default  reduce usando la regla 11 (estructura)
+
+
+estado 102
+
+   13 lista_miembros: lista_miembros tipo ID . ';'
+
+    ';'  desplazar e ir al estado 118
+
+
+estado 103
+
+  102 primaria: ID '[' expresion . ']'
+
+    ']'  desplazar e ir al estado 119
+
+
+estado 104
+
+  103 primaria: ID '.' ID .
+
+    $default  reduce usando la regla 103 (primaria)
+
+
+estado 105
+
+   81 asignacion: ID '=' . expresion
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 120
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 106
+
+  104 primaria: '(' expresion ')' .
+
+    $default  reduce usando la regla 104 (primaria)
+
+
+estado 107
+
+   84 logica_or: logica_or OP_LOGICO logica_and .
+   86 logica_and: logica_and . OP_LOGICO igualdad
+
+    $default  reduce usando la regla 84 (logica_or)
+
+
+estado 108
+
+   86 logica_and: logica_and OP_LOGICO igualdad .
+   88 igualdad: igualdad . OP_REL relacional
+
+    OP_REL  desplazar e ir al estado 88
+
+    $default  reduce usando la regla 86 (logica_and)
+
+
+estado 109
+
+   88 igualdad: igualdad OP_REL relacional .
+   90 relacional: relacional . OP_REL aditiva
+
+    $default  reduce usando la regla 88 (igualdad)
+
+
+estado 110
+
+   90 relacional: relacional OP_REL aditiva .
+   92 aditiva: aditiva . OP_ARIT multiplicativa
+
+    OP_ARIT  desplazar e ir al estado 90
+
+    $default  reduce usando la regla 90 (relacional)
+
+
+estado 111
+
+   92 aditiva: aditiva OP_ARIT multiplicativa .
+   94 multiplicativa: multiplicativa . OP_ARIT unaria
+
+    $default  reduce usando la regla 92 (aditiva)
+
+
+estado 112
+
+   94 multiplicativa: multiplicativa OP_ARIT unaria .
+
+    $default  reduce usando la regla 94 (multiplicativa)
+
+
+estado 113
+
+   17 arreglo: tipo ID '[' tamano ']' '=' . '{' lista_expresiones '}' ';'
+
+    '{'  desplazar e ir al estado 121
+
+
+estado 114
+
+   18 arreglo: tipo ID '[' tamano ']' ';' .
+
+    $default  reduce usando la regla 18 (arreglo)
+
+
+estado 115
+
+   33 funcion: tipo ID '(' parametros ')' bloque .
+
+    $default  reduce usando la regla 33 (funcion)
+
+
+estado 116
+
+   41 bloque: '{' $@1 lista_sentencias . '}'
+   43 lista_sentencias: lista_sentencias . sentencia
+
+    ID          desplazar e ir al estado 80
+    CADENA      desplazar e ir al estado 43
+    ENTERO      desplazar e ir al estado 44
+    FLOTANTE    desplazar e ir al estado 45
+    CARACTER    desplazar e ir al estado 46
+    SI          desplazar e ir al estado 122
+    ELEGIR      desplazar e ir al estado 123
+    ROMPER      desplazar e ir al estado 124
+    CONTINUAR   desplazar e ir al estado 125
+    IMPRIMIR    desplazar e ir al estado 126
+    LEER        desplazar e ir al estado 127
+    DEVOLVER    desplazar e ir al estado 128
+    MIENTRAS    desplazar e ir al estado 129
+    PARA        desplazar e ir al estado 130
+    HACER       desplazar e ir al estado 131
+    VERDADERO   desplazar e ir al estado 47
+    FALSO       desplazar e ir al estado 48
+    OP_ARIT     desplazar e ir al estado 49
+    COMENTARIO  desplazar e ir al estado 13
+    '{'         desplazar e ir al estado 69
+    '}'         desplazar e ir al estado 132
+    '('         desplazar e ir al estado 50
+    '!'         desplazar e ir al estado 51
+
+    comentario         ir al estado 133
+    bloque             ir al estado 134
+    sentencia          ir al estado 135
+    expr_sent          ir al estado 136
+    si                 ir al estado 137
+    elegir             ir al estado 138
+    bucle              ir al estado 139
+    mientras           ir al estado 140
+    para               ir al estado 141
+    hacer_mientras     ir al estado 142
+    retorno            ir al estado 143
+    expresion          ir al estado 144
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+    imprimir           ir al estado 145
+    leer               ir al estado 146
+
+
+estado 117
+
+   39 parametro: tipo ID '=' expresion_no_asig .
+
+    $default  reduce usando la regla 39 (parametro)
+
+
+estado 118
+
+   13 lista_miembros: lista_miembros tipo ID ';' .
+
+    $default  reduce usando la regla 13 (lista_miembros)
+
+
+estado 119
+
+  102 primaria: ID '[' expresion ']' .
+
+    $default  reduce usando la regla 102 (primaria)
+
+
+estado 120
+
+   81 asignacion: ID '=' expresion .
+
+    $default  reduce usando la regla 81 (asignacion)
+
+
+estado 121
+
+   17 arreglo: tipo ID '[' tamano ']' '=' '{' . lista_expresiones '}' ';'
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    lista_expresiones  ir al estado 147
+    expresion_no_asig  ir al estado 148
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 122
+
+   56 si: SI . '(' expresion ')' bloque lista_sinosi_opcional sino_opcional
+
+    '('  desplazar e ir al estado 149
+
+
+estado 123
+
+   61 elegir: ELEGIR . '(' expresion ')' '{' lista_casos_opcional defecto_opcional '}'
+
+    '('  desplazar e ir al estado 150
+
+
+estado 124
+
+   48 sentencia: ROMPER . ';'
+
+    ';'  desplazar e ir al estado 151
+
+
+estado 125
+
+   49 sentencia: CONTINUAR . ';'
+
+    ';'  desplazar e ir al estado 152
+
+
+estado 126
+
+  111 imprimir: IMPRIMIR . '(' ')' ';'
+  112         | IMPRIMIR . '(' argumentos_imprimir ')' ';'
+
+    '('  desplazar e ir al estado 153
+
+
+estado 127
+
+  115 leer: LEER . '(' ID ')' ';'
+
+    '('  desplazar e ir al estado 154
+
+
+estado 128
+
+   77 retorno: DEVOLVER . ';'
+   78        | DEVOLVER . expresion ';'
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    ';'        desplazar e ir al estado 155
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 156
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 129
+
+   70 mientras: MIENTRAS . '(' expresion ')' bloque
+
+    '('  desplazar e ir al estado 157
+
+
+estado 130
+
+   71 para: PARA . '(' variable expresion_opt ';' expresion_opt ')' bloque
+   72     | PARA . '(' expr_sent expresion_opt ';' expresion_opt ')' bloque
+   73     | PARA . '(' ';' expresion_opt ';' expresion_opt ')' bloque
+
+    '('  desplazar e ir al estado 158
+
+
+estado 131
+
+   76 hacer_mientras: HACER . bloque MIENTRAS '(' expresion ')' ';'
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 159
+
+
+estado 132
+
+   41 bloque: '{' $@1 lista_sentencias '}' .
+
+    $default  reduce usando la regla 41 (bloque)
+
+
+estado 133
+
+   52 sentencia: comentario .
+
+    $default  reduce usando la regla 52 (sentencia)
+
+
+estado 134
+
+   51 sentencia: bloque .
+
+    $default  reduce usando la regla 51 (sentencia)
+
+
+estado 135
+
+   43 lista_sentencias: lista_sentencias sentencia .
+
+    $default  reduce usando la regla 43 (lista_sentencias)
+
+
+estado 136
+
+   50 sentencia: expr_sent .
+
+    $default  reduce usando la regla 50 (sentencia)
+
+
+estado 137
+
+   44 sentencia: si .
+
+    $default  reduce usando la regla 44 (sentencia)
+
+
+estado 138
+
+   45 sentencia: elegir .
+
+    $default  reduce usando la regla 45 (sentencia)
+
+
+estado 139
+
+   46 sentencia: bucle .
+
+    $default  reduce usando la regla 46 (sentencia)
+
+
+estado 140
+
+   67 bucle: mientras .
+
+    $default  reduce usando la regla 67 (bucle)
+
+
+estado 141
+
+   68 bucle: para .
+
+    $default  reduce usando la regla 68 (bucle)
+
+
+estado 142
+
+   69 bucle: hacer_mientras .
+
+    $default  reduce usando la regla 69 (bucle)
+
+
+estado 143
+
+   47 sentencia: retorno .
+
+    $default  reduce usando la regla 47 (sentencia)
+
+
+estado 144
+
+   55 expr_sent: expresion . ';'
+
+    ';'  desplazar e ir al estado 160
+
+
+estado 145
+
+   53 sentencia: imprimir .
+
+    $default  reduce usando la regla 53 (sentencia)
+
+
+estado 146
+
+   54 sentencia: leer .
+
+    $default  reduce usando la regla 54 (sentencia)
+
+
+estado 147
+
+   17 arreglo: tipo ID '[' tamano ']' '=' '{' lista_expresiones . '}' ';'
+   22 lista_expresiones: lista_expresiones . ',' expresion_no_asig
+
+    '}'  desplazar e ir al estado 161
+    ','  desplazar e ir al estado 162
+
+
+estado 148
+
+   21 lista_expresiones: expresion_no_asig .
+
+    $default  reduce usando la regla 21 (lista_expresiones)
+
+
+estado 149
+
+   56 si: SI '(' . expresion ')' bloque lista_sinosi_opcional sino_opcional
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 163
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 150
+
+   61 elegir: ELEGIR '(' . expresion ')' '{' lista_casos_opcional defecto_opcional '}'
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 164
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 151
+
+   48 sentencia: ROMPER ';' .
+
+    $default  reduce usando la regla 48 (sentencia)
+
+
+estado 152
+
+   49 sentencia: CONTINUAR ';' .
+
+    $default  reduce usando la regla 49 (sentencia)
+
+
+estado 153
+
+  111 imprimir: IMPRIMIR '(' . ')' ';'
+  112         | IMPRIMIR '(' . argumentos_imprimir ')' ';'
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    ')'        desplazar e ir al estado 165
+    '!'        desplazar e ir al estado 51
+
+    expresion            ir al estado 166
+    asignacion           ir al estado 82
+    expresion_no_asig    ir al estado 83
+    logica_or            ir al estado 53
+    logica_and           ir al estado 54
+    igualdad             ir al estado 55
+    relacional           ir al estado 56
+    aditiva              ir al estado 57
+    multiplicativa       ir al estado 58
+    unaria               ir al estado 59
+    postfija             ir al estado 60
+    primaria             ir al estado 61
+    literal              ir al estado 62
+    argumentos_imprimir  ir al estado 167
+
+
+estado 154
+
+  115 leer: LEER '(' . ID ')' ';'
+
+    ID  desplazar e ir al estado 168
+
+
+estado 155
+
+   77 retorno: DEVOLVER ';' .
+
+    $default  reduce usando la regla 77 (retorno)
+
+
+estado 156
+
+   78 retorno: DEVOLVER expresion . ';'
+
+    ';'  desplazar e ir al estado 169
+
+
+estado 157
+
+   70 mientras: MIENTRAS '(' . expresion ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 170
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 158
+
+   71 para: PARA '(' . variable expresion_opt ';' expresion_opt ')' bloque
+   72     | PARA '(' . expr_sent expresion_opt ';' expresion_opt ')' bloque
+   73     | PARA '(' . ';' expresion_opt ';' expresion_opt ')' bloque
+
+    ID           desplazar e ir al estado 171
+    CADENA       desplazar e ir al estado 43
+    ENTERO       desplazar e ir al estado 44
+    FLOTANTE     desplazar e ir al estado 45
+    CARACTER     desplazar e ir al estado 46
+    TIPO_ENT     desplazar e ir al estado 5
+    TIPO_FLOAT   desplazar e ir al estado 6
+    TIPO_CHAR    desplazar e ir al estado 7
+    TIPO_BOOL    desplazar e ir al estado 8
+    TIPO_STRING  desplazar e ir al estado 9
+    CONSTANTE    desplazar e ir al estado 35
+    VERDADERO    desplazar e ir al estado 47
+    FALSO        desplazar e ir al estado 48
+    OP_ARIT      desplazar e ir al estado 49
+    ';'          desplazar e ir al estado 172
+    '('          desplazar e ir al estado 50
+    '!'          desplazar e ir al estado 51
+
+    variable           ir al estado 173
+    tipo               ir al estado 174
+    tipo_base          ir al estado 21
+    expr_sent          ir al estado 175
+    expresion          ir al estado 144
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 159
+
+   76 hacer_mientras: HACER bloque . MIENTRAS '(' expresion ')' ';'
+
+    MIENTRAS  desplazar e ir al estado 176
+
+
+estado 160
+
+   55 expr_sent: expresion ';' .
+
+    $default  reduce usando la regla 55 (expr_sent)
+
+
+estado 161
+
+   17 arreglo: tipo ID '[' tamano ']' '=' '{' lista_expresiones '}' . ';'
+
+    ';'  desplazar e ir al estado 177
+
+
+estado 162
+
+   22 lista_expresiones: lista_expresiones ',' . expresion_no_asig
+
+    ID         desplazar e ir al estado 42
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion_no_asig  ir al estado 178
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 163
+
+   56 si: SI '(' expresion . ')' bloque lista_sinosi_opcional sino_opcional
+
+    ')'  desplazar e ir al estado 179
+
+
+estado 164
+
+   61 elegir: ELEGIR '(' expresion . ')' '{' lista_casos_opcional defecto_opcional '}'
+
+    ')'  desplazar e ir al estado 180
+
+
+estado 165
+
+  111 imprimir: IMPRIMIR '(' ')' . ';'
+
+    ';'  desplazar e ir al estado 181
+
+
+estado 166
+
+  113 argumentos_imprimir: expresion .
+
+    $default  reduce usando la regla 113 (argumentos_imprimir)
+
+
+estado 167
+
+  112 imprimir: IMPRIMIR '(' argumentos_imprimir . ')' ';'
+  114 argumentos_imprimir: argumentos_imprimir . ',' expresion
+
+    ','  desplazar e ir al estado 182
+    ')'  desplazar e ir al estado 183
+
+
+estado 168
+
+  115 leer: LEER '(' ID . ')' ';'
+
+    ')'  desplazar e ir al estado 184
+
+
+estado 169
+
+   78 retorno: DEVOLVER expresion ';' .
+
+    $default  reduce usando la regla 78 (retorno)
+
+
+estado 170
+
+   70 mientras: MIENTRAS '(' expresion . ')' bloque
+
+    ')'  desplazar e ir al estado 185
+
+
+estado 171
+
+   25 tipo: ID .
+   31 tipo_base: ID .
+   81 asignacion: ID . '=' expresion
+  101 primaria: ID .
+  102         | ID . '[' expresion ']'
+  103         | ID . '.' ID
+
+    '='  desplazar e ir al estado 105
+    '['  desplazar e ir al estado 77
+    '.'  desplazar e ir al estado 78
+
+    ID        reduce usando la regla 25 (tipo)
+    ID        [reduce usando la regla 31 (tipo_base)]
+    $default  reduce usando la regla 101 (primaria)
+
+
+estado 172
+
+   73 para: PARA '(' ';' . expresion_opt ';' expresion_opt ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    $default  reduce usando la regla 74 (expresion_opt)
+
+    expresion_opt      ir al estado 186
+    expresion          ir al estado 187
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 173
+
+   71 para: PARA '(' variable . expresion_opt ';' expresion_opt ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    $default  reduce usando la regla 74 (expresion_opt)
+
+    expresion_opt      ir al estado 188
+    expresion          ir al estado 187
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 174
+
+   14 variable: tipo . ID '=' expresion_no_asig ';'
+   15         | tipo . ID ';'
+
+    ID  desplazar e ir al estado 189
+
+
+estado 175
+
+   72 para: PARA '(' expr_sent . expresion_opt ';' expresion_opt ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    $default  reduce usando la regla 74 (expresion_opt)
+
+    expresion_opt      ir al estado 190
+    expresion          ir al estado 187
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 176
+
+   76 hacer_mientras: HACER bloque MIENTRAS . '(' expresion ')' ';'
+
+    '('  desplazar e ir al estado 191
+
+
+estado 177
+
+   17 arreglo: tipo ID '[' tamano ']' '=' '{' lista_expresiones '}' ';' .
+
+    $default  reduce usando la regla 17 (arreglo)
+
+
+estado 178
+
+   22 lista_expresiones: lista_expresiones ',' expresion_no_asig .
+
+    $default  reduce usando la regla 22 (lista_expresiones)
+
+
+estado 179
+
+   56 si: SI '(' expresion ')' . bloque lista_sinosi_opcional sino_opcional
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 192
+
+
+estado 180
+
+   61 elegir: ELEGIR '(' expresion ')' . '{' lista_casos_opcional defecto_opcional '}'
+
+    '{'  desplazar e ir al estado 193
+
+
+estado 181
+
+  111 imprimir: IMPRIMIR '(' ')' ';' .
+
+    $default  reduce usando la regla 111 (imprimir)
+
+
+estado 182
+
+  114 argumentos_imprimir: argumentos_imprimir ',' . expresion
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 194
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 183
+
+  112 imprimir: IMPRIMIR '(' argumentos_imprimir ')' . ';'
+
+    ';'  desplazar e ir al estado 195
+
+
+estado 184
+
+  115 leer: LEER '(' ID ')' . ';'
+
+    ';'  desplazar e ir al estado 196
+
+
+estado 185
+
+   70 mientras: MIENTRAS '(' expresion ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 197
+
+
+estado 186
+
+   73 para: PARA '(' ';' expresion_opt . ';' expresion_opt ')' bloque
+
+    ';'  desplazar e ir al estado 198
+
+
+estado 187
+
+   75 expresion_opt: expresion .
+
+    $default  reduce usando la regla 75 (expresion_opt)
+
+
+estado 188
+
+   71 para: PARA '(' variable expresion_opt . ';' expresion_opt ')' bloque
+
+    ';'  desplazar e ir al estado 199
+
+
+estado 189
+
+   14 variable: tipo ID . '=' expresion_no_asig ';'
+   15         | tipo ID . ';'
+
+    '='  desplazar e ir al estado 31
+    ';'  desplazar e ir al estado 32
+
+
+estado 190
+
+   72 para: PARA '(' expr_sent expresion_opt . ';' expresion_opt ')' bloque
+
+    ';'  desplazar e ir al estado 200
+
+
+estado 191
+
+   76 hacer_mientras: HACER bloque MIENTRAS '(' . expresion ')' ';'
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 201
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 192
+
+   56 si: SI '(' expresion ')' bloque . lista_sinosi_opcional sino_opcional
+
+    $default  reduce usando la regla 57 (lista_sinosi_opcional)
+
+    lista_sinosi_opcional  ir al estado 202
+
+
+estado 193
+
+   61 elegir: ELEGIR '(' expresion ')' '{' . lista_casos_opcional defecto_opcional '}'
+
+    $default  reduce usando la regla 62 (lista_casos_opcional)
+
+    lista_casos_opcional  ir al estado 203
+
+
+estado 194
+
+  114 argumentos_imprimir: argumentos_imprimir ',' expresion .
+
+    $default  reduce usando la regla 114 (argumentos_imprimir)
+
+
+estado 195
+
+  112 imprimir: IMPRIMIR '(' argumentos_imprimir ')' ';' .
+
+    $default  reduce usando la regla 112 (imprimir)
+
+
+estado 196
+
+  115 leer: LEER '(' ID ')' ';' .
+
+    $default  reduce usando la regla 115 (leer)
+
+
+estado 197
+
+   70 mientras: MIENTRAS '(' expresion ')' bloque .
+
+    $default  reduce usando la regla 70 (mientras)
+
+
+estado 198
+
+   73 para: PARA '(' ';' expresion_opt ';' . expresion_opt ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    $default  reduce usando la regla 74 (expresion_opt)
+
+    expresion_opt      ir al estado 204
+    expresion          ir al estado 187
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 199
+
+   71 para: PARA '(' variable expresion_opt ';' . expresion_opt ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    $default  reduce usando la regla 74 (expresion_opt)
+
+    expresion_opt      ir al estado 205
+    expresion          ir al estado 187
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 200
+
+   72 para: PARA '(' expr_sent expresion_opt ';' . expresion_opt ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    $default  reduce usando la regla 74 (expresion_opt)
+
+    expresion_opt      ir al estado 206
+    expresion          ir al estado 187
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 201
+
+   76 hacer_mientras: HACER bloque MIENTRAS '(' expresion . ')' ';'
+
+    ')'  desplazar e ir al estado 207
+
+
+estado 202
+
+   56 si: SI '(' expresion ')' bloque lista_sinosi_opcional . sino_opcional
+   58 lista_sinosi_opcional: lista_sinosi_opcional . SINOSI '(' expresion ')' bloque
+
+    SINOSI  desplazar e ir al estado 208
+    SINO    desplazar e ir al estado 209
+
+    $default  reduce usando la regla 59 (sino_opcional)
+
+    sino_opcional  ir al estado 210
+
+
+estado 203
+
+   61 elegir: ELEGIR '(' expresion ')' '{' lista_casos_opcional . defecto_opcional '}'
+   63 lista_casos_opcional: lista_casos_opcional . CASO expresion ':' sentencias_con_romper
+
+    CASO     desplazar e ir al estado 211
+    DEFECTO  desplazar e ir al estado 212
+
+    defecto_opcional  ir al estado 213
+
+
+estado 204
+
+   73 para: PARA '(' ';' expresion_opt ';' expresion_opt . ')' bloque
+
+    ')'  desplazar e ir al estado 214
+
+
+estado 205
+
+   71 para: PARA '(' variable expresion_opt ';' expresion_opt . ')' bloque
+
+    ')'  desplazar e ir al estado 215
+
+
+estado 206
+
+   72 para: PARA '(' expr_sent expresion_opt ';' expresion_opt . ')' bloque
+
+    ')'  desplazar e ir al estado 216
+
+
+estado 207
+
+   76 hacer_mientras: HACER bloque MIENTRAS '(' expresion ')' . ';'
+
+    ';'  desplazar e ir al estado 217
+
+
+estado 208
+
+   58 lista_sinosi_opcional: lista_sinosi_opcional SINOSI . '(' expresion ')' bloque
+
+    '('  desplazar e ir al estado 218
+
+
+estado 209
+
+   60 sino_opcional: SINO . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 219
+
+
+estado 210
+
+   56 si: SI '(' expresion ')' bloque lista_sinosi_opcional sino_opcional .
+
+    $default  reduce usando la regla 56 (si)
+
+
+estado 211
+
+   63 lista_casos_opcional: lista_casos_opcional CASO . expresion ':' sentencias_con_romper
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 220
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 212
+
+   64 defecto_opcional: DEFECTO . ':' sentencias_con_romper
+
+    ':'  desplazar e ir al estado 221
+
+
+estado 213
+
+   61 elegir: ELEGIR '(' expresion ')' '{' lista_casos_opcional defecto_opcional . '}'
+
+    '}'  desplazar e ir al estado 222
+
+
+estado 214
+
+   73 para: PARA '(' ';' expresion_opt ';' expresion_opt ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 223
+
+
+estado 215
+
+   71 para: PARA '(' variable expresion_opt ';' expresion_opt ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 224
+
+
+estado 216
+
+   72 para: PARA '(' expr_sent expresion_opt ';' expresion_opt ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 225
+
+
+estado 217
+
+   76 hacer_mientras: HACER bloque MIENTRAS '(' expresion ')' ';' .
+
+    $default  reduce usando la regla 76 (hacer_mientras)
+
+
+estado 218
+
+   58 lista_sinosi_opcional: lista_sinosi_opcional SINOSI '(' . expresion ')' bloque
+
+    ID         desplazar e ir al estado 80
+    CADENA     desplazar e ir al estado 43
+    ENTERO     desplazar e ir al estado 44
+    FLOTANTE   desplazar e ir al estado 45
+    CARACTER   desplazar e ir al estado 46
+    VERDADERO  desplazar e ir al estado 47
+    FALSO      desplazar e ir al estado 48
+    OP_ARIT    desplazar e ir al estado 49
+    '('        desplazar e ir al estado 50
+    '!'        desplazar e ir al estado 51
+
+    expresion          ir al estado 226
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+
+
+estado 219
+
+   60 sino_opcional: SINO bloque .
+
+    $default  reduce usando la regla 60 (sino_opcional)
+
+
+estado 220
+
+   63 lista_casos_opcional: lista_casos_opcional CASO expresion . ':' sentencias_con_romper
+
+    ':'  desplazar e ir al estado 227
+
+
+estado 221
+
+   64 defecto_opcional: DEFECTO ':' . sentencias_con_romper
+
+    $default  reduce usando la regla 42 (lista_sentencias)
+
+    lista_sentencias       ir al estado 228
+    sentencias_con_romper  ir al estado 229
+
+
+estado 222
+
+   61 elegir: ELEGIR '(' expresion ')' '{' lista_casos_opcional defecto_opcional '}' .
+
+    $default  reduce usando la regla 61 (elegir)
+
+
+estado 223
+
+   73 para: PARA '(' ';' expresion_opt ';' expresion_opt ')' bloque .
+
+    $default  reduce usando la regla 73 (para)
+
+
+estado 224
+
+   71 para: PARA '(' variable expresion_opt ';' expresion_opt ')' bloque .
+
+    $default  reduce usando la regla 71 (para)
+
+
+estado 225
+
+   72 para: PARA '(' expr_sent expresion_opt ';' expresion_opt ')' bloque .
+
+    $default  reduce usando la regla 72 (para)
+
+
+estado 226
+
+   58 lista_sinosi_opcional: lista_sinosi_opcional SINOSI '(' expresion . ')' bloque
+
+    ')'  desplazar e ir al estado 230
+
+
+estado 227
+
+   63 lista_casos_opcional: lista_casos_opcional CASO expresion ':' . sentencias_con_romper
+
+    $default  reduce usando la regla 42 (lista_sentencias)
+
+    lista_sentencias       ir al estado 228
+    sentencias_con_romper  ir al estado 231
+
+
+estado 228
+
+   43 lista_sentencias: lista_sentencias . sentencia
+   65 sentencias_con_romper: lista_sentencias .
+   66                      | lista_sentencias . ROMPER ';'
+
+    ID          desplazar e ir al estado 80
+    CADENA      desplazar e ir al estado 43
+    ENTERO      desplazar e ir al estado 44
+    FLOTANTE    desplazar e ir al estado 45
+    CARACTER    desplazar e ir al estado 46
+    SI          desplazar e ir al estado 122
+    ELEGIR      desplazar e ir al estado 123
+    ROMPER      desplazar e ir al estado 232
+    CONTINUAR   desplazar e ir al estado 125
+    IMPRIMIR    desplazar e ir al estado 126
+    LEER        desplazar e ir al estado 127
+    DEVOLVER    desplazar e ir al estado 128
+    MIENTRAS    desplazar e ir al estado 129
+    PARA        desplazar e ir al estado 130
+    HACER       desplazar e ir al estado 131
+    VERDADERO   desplazar e ir al estado 47
+    FALSO       desplazar e ir al estado 48
+    OP_ARIT     desplazar e ir al estado 49
+    COMENTARIO  desplazar e ir al estado 13
+    '{'         desplazar e ir al estado 69
+    '('         desplazar e ir al estado 50
+    '!'         desplazar e ir al estado 51
+
+    $default  reduce usando la regla 65 (sentencias_con_romper)
+
+    comentario         ir al estado 133
+    bloque             ir al estado 134
+    sentencia          ir al estado 135
+    expr_sent          ir al estado 136
+    si                 ir al estado 137
+    elegir             ir al estado 138
+    bucle              ir al estado 139
+    mientras           ir al estado 140
+    para               ir al estado 141
+    hacer_mientras     ir al estado 142
+    retorno            ir al estado 143
+    expresion          ir al estado 144
+    asignacion         ir al estado 82
+    expresion_no_asig  ir al estado 83
+    logica_or          ir al estado 53
+    logica_and         ir al estado 54
+    igualdad           ir al estado 55
+    relacional         ir al estado 56
+    aditiva            ir al estado 57
+    multiplicativa     ir al estado 58
+    unaria             ir al estado 59
+    postfija           ir al estado 60
+    primaria           ir al estado 61
+    literal            ir al estado 62
+    imprimir           ir al estado 145
+    leer               ir al estado 146
+
+
+estado 229
+
+   64 defecto_opcional: DEFECTO ':' sentencias_con_romper .
+
+    $default  reduce usando la regla 64 (defecto_opcional)
+
+
+estado 230
+
+   58 lista_sinosi_opcional: lista_sinosi_opcional SINOSI '(' expresion ')' . bloque
+
+    '{'  desplazar e ir al estado 69
+
+    bloque  ir al estado 233
+
+
+estado 231
+
+   63 lista_casos_opcional: lista_casos_opcional CASO expresion ':' sentencias_con_romper .
+
+    $default  reduce usando la regla 63 (lista_casos_opcional)
+
+
+estado 232
+
+   48 sentencia: ROMPER . ';'
+   66 sentencias_con_romper: lista_sentencias ROMPER . ';'
+
+    ';'  desplazar e ir al estado 234
+
+
+estado 233
+
+   58 lista_sinosi_opcional: lista_sinosi_opcional SINOSI '(' expresion ')' bloque .
+
+    $default  reduce usando la regla 58 (lista_sinosi_opcional)
+
+
+estado 234
+
+   48 sentencia: ROMPER ';' .
+   66 sentencias_con_romper: lista_sentencias ROMPER ';' .
+
+    CASO      reduce usando la regla 48 (sentencia)
+    CASO      [reduce usando la regla 66 (sentencias_con_romper)]
+    DEFECTO   reduce usando la regla 48 (sentencia)
+    DEFECTO   [reduce usando la regla 66 (sentencias_con_romper)]
+    '}'       reduce usando la regla 48 (sentencia)
+    '}'       [reduce usando la regla 66 (sentencias_con_romper)]
+    $default  reduce usando la regla 48 (sentencia)

@@ -1,0 +1,79 @@
+// Este es un comentario de una línea
+/.
+Este es un comentario
+de múltiples líneas
+./
+
+estructura Persona {
+    entero edad;
+    cadena nombre;
+    booleano activo;
+};
+
+entero global = 42;
+flotante pi = 3.1416;
+cadena saludo = "Hola mundo";
+booleano flag = verdadero;
+caracter letra = 'A';
+
+entero factorial(entero n) {
+    si (n <= 1) {
+        devolver 1;
+    }
+    sino {
+        devolver n * factorial(n - 1);
+    }
+}
+
+void imprimirInfo(Persona p) {
+    imprimir("Nombre:", p.nombre, "Edad:", p.edad);
+    si (p.activo == verdadero) {
+        imprimir("Estado: activo");
+    }
+    sino {
+        imprimir("Estado: inactivo");
+    }
+}
+
+void main() {
+    
+    entero i = 0;
+    mientras (i < 10) {
+        imprimir("Iteración:", i);
+        i++;
+    }
+    
+    para (entero j = 0; j < 5; j++) {
+        si (j % 2 == 0) {
+            continuar;
+        }
+        imprimir("Numero impar:", j);
+    }
+    
+    elegir (usuario) {
+        caso 30:
+            imprimir("Tiene 30 años");
+            romper;
+        defecto:
+            imprimir("Edad diferente");
+    }
+    
+    entero resultado = factorial(5);
+    imprimir("5! =", resultado);
+    
+    leer(usuario);
+    imprimirInfo(usuario);
+    
+    // Operadores
+    entero a = 10;
+    booleano cond = (a < b) && (b != a) || !flag;
+    //flotante calculo = (a + b) * pi / 2.0 - 5 % 3;
+    
+    // Arreglos
+    arreglo[0] = 100;
+    entero valor = arreglo[0] + arreglo[1];
+    
+    // Errores léxicos (para probar el manejo de errores)
+    @#$ // Símbolos no reconocidos
+    'abc' // Carácter inválido (más de un carácter)
+}

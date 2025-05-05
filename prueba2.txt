@@ -1,0 +1,10 @@
+constante entero MAX = 100;
+
+entero factorial(entero n) {
+  si (n == 0) {
+    devolver 1;
+  }
+  sino {
+    devolver n * factorial(n - 1);
+  }
+}

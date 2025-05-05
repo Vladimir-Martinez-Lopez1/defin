@@ -1,0 +1,4 @@
+entero x = 5;
+si (x > 3) {
+    imprimir("Mayor que 3");
+}

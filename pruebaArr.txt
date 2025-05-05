@@ -1,0 +1,40 @@
+// Ejemplo 1: Programa básico con funciones y estructuras
+estructura Persona {
+    entero edad;
+    cadena nombre;
+};
+
+entero suma(entero a, entero b) {
+    devolver a + b;
+}
+
+void saludar(cadena nombre) {
+    imprimir("Hola, ", nombre);
+}
+
+// Ejemplo 2: Estructuras de control
+entero main() {
+    // Declaraciones básicas
+    entero x = 10;
+    flotante y = 3.14;
+    caracter c = 'A';
+    booleano flag = verdadero;
+    cadena mensaje = "Hola mundo";
+    
+    // Arreglos
+    entero numeros[5] = {1, 2, 3, 4, 5};
+    
+    // Estructura
+    Persona p;
+    p.edad = 25;
+    p.nombre = "Juan";
+    
+    // If-else
+    si (x > 5) {
+        imprimir("x es mayor que 5");
+    } sino si (x < 5) {
+        imprimir("x es menor que 5");
+    } sino {
+        imprimir("x es igual a 5");
+    }
+    
