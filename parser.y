@@ -321,39 +321,40 @@ miembro
 
 expr_sent
     : expresion ';'
-    | expresion  error {  // Falta ';'  comprobar usando todo ya que puede causar conflicto, sino eliminar  
-        agregarError(5, yylineno ); 
+    | expresion error {  // Falta ';'
+        agregarError(5, yylineno );
         yyerrok;
         numErroresSintacticos++;
     }
-    | IMPRIMIR '(' argumentos')' ';'
-    | IMPRIMIR '(' argumentos ')' error {  // Falta ';'
-        agregarError(5, yylineno ); 
+    | IMPRIMIR '(' argumentos ')' ';'
+    | IMPRIMIR '(' argumentos ')' error {
+        agregarError(5, yylineno );  // Falta ';'
         yyerrok;
         numErroresSintacticos++;
     }
-    | IMPRIMIR error argumentos ')' ';'   {
-        agregarError(3, yylineno ); //falta  '(' abrir
+    | IMPRIMIR error argumentos ')' ';' {
+        agregarError(3, yylineno );  // Falta '('
         yyerrok;
         numErroresSintacticos++;
     }
-    | IMPRIMIR '(' argumentos error ';'  {
-        agregarError(4, yylineno ); //falta  ')' cierre
+    | IMPRIMIR '(' argumentos error ';' {
+        agregarError(4, yylineno );  // Falta ')'
         yyerrok;
         numErroresSintacticos++;
     }
     | LEER '(' ID ')' ';'
-    | LEER error ID ')' ';'   {
-        agregarError(3, yylineno ); //falta  '(' abrir
+    | LEER error ID ')' ';' {
+        agregarError(3, yylineno );  // Falta '('
         yyerrok;
         numErroresSintacticos++;
     }
-    | LEER '(' ID error ';'  {
-        agregarError(4, yylineno ); //falta  ')' cierre
+    | LEER '(' ID error ';' {
+        agregarError(4, yylineno );  // Falta ')'
         yyerrok;
         numErroresSintacticos++;
     }
     ;
+
 
 si
     : SI '(' expresion ')' bloque sinosi_opt
@@ -487,58 +488,45 @@ mientras
     ;
 
 para
-    : PARA '(' decl_var_inicializacion ';' expresion ';' expresion')' bloque
-    | PARA '(' decl_var_inicializacion error expresion ';' expresion')' bloque  {  // Falta ';'
-        agregarError(5, yylineno ); 
+    : PARA '(' inicializacion_for ';' expresion ';' expresion ')' bloque
+    | PARA '(' inicializacion_for error expresion ';' expresion ')' bloque {
+        agregarError(5, yylineno ); // Falta ';'
         yyerrok;
         numErroresSintacticos++;
     }
-    | PARA '(' decl_var_inicializacion ';' expresion error expresion')' bloque  {  // Falta ';'
-        agregarError(5, yylineno ); 
+    | PARA '(' inicializacion_for ';' expresion error expresion ')' bloque {
+        agregarError(5, yylineno ); // Falta ';'
         yyerrok;
         numErroresSintacticos++;
     }
-    | PARA error decl_var_inicializacion ';' expresion ';' expresion')' bloque {
-        agregarError(3, yylineno ); //falta  '(' abrir
+    | PARA error inicializacion_for ';' expresion ';' expresion ')' bloque {
+        agregarError(3, yylineno ); // Falta '('
         yyerrok;
         numErroresSintacticos++;
     }
-    | PARA '(' decl_var_inicializacion ';' expresion ';' expresion error bloque {
-        agregarError(4, yylineno ); //falta  ')' cierre
-        yyerrok;
-        numErroresSintacticos++;
-    }
-    | PARA '(' expr_sent  ';' expresion ';' expresion ')' bloque
-    | PARA '(' expr_sent  error expresion ';' expresion ')' bloque  {  // Falta ';'
-        agregarError(5, yylineno ); 
-        yyerrok;
-        numErroresSintacticos++;
-    }
-    | PARA '(' expr_sent  ';' expresion error expresion ')' bloque  {  // Falta ';'
-        agregarError(5, yylineno ); 
-        yyerrok;
-        numErroresSintacticos++;
-    }
-    | PARA error expr_sent  ';' expresion ';' expresion ')' bloque   {
-        agregarError(3, yylineno ); //falta  '(' abrir
-        yyerrok;
-        numErroresSintacticos++;
-    }
-    | PARA '(' expr_sent  ';' expresion ';' expresion error bloque  {
-        agregarError(4, yylineno ); //falta  ')' cierre
+    | PARA '(' inicializacion_for ';' expresion ';' expresion error bloque {
+        agregarError(4, yylineno ); // Falta ')'
         yyerrok;
         numErroresSintacticos++;
     }
     ;
 
+
+inicializacion_for
+    : decl_var_inicializacion
+    | expresion
+    | vacio
+    ;
+    
 decl_var_inicializacion
     : tipo ID '=' expresion
     | tipo ID error expresion {  // Falta '='
-        agregarError(8, yylineno ); // 
+        agregarError(8, yylineno );
         yyerrok;
         numErroresSintacticos++;
     }
     ;
+
 
 hacer_mientras
     : HACER bloque MIENTRAS '(' expresion ')' ';'
